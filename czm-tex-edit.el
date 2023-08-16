@@ -505,6 +505,32 @@ Format a LaTeX math environment at the current point by surrounding the math env
 	(evil-next-line))
     (LaTeX-insert-item)))
 
+
+(defun texmathp-region ()
+  "Get the math region containing point in a LaTeX buffer.
+
+Currently only supports $...$ and \begin{...} \end{...} blocks."
+  (interactive)
+  (when (texmathp)
+    (let* ((pos (point))
+           (math-start (cdr texmathp-why))
+           (math-end (save-excursion
+                       (goto-char math-start)
+                       (cond
+                        ;; Toggle math mode
+                        ((looking-at-p "\\$")
+			 (search-forward "$" nil t 2))
+                        ;; Environment math mode
+                        (t
+			 (end-of-line)
+			 (LaTeX-find-matching-end)
+			 (end-of-line)
+                         ))
+		       (point)
+		       )))
+      (cons math-start math-end)
+      )))
+
 (defun czm-exit-equation-save-and-previous-or-insert-item-without-evil
     ()
   (interactive)
