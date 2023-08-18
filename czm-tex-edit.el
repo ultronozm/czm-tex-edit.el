@@ -3,9 +3,9 @@
 ;; Copyright (C) 2023  Paul D. Nelson
 
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
-;; Version: 0.1
+;; Version: 0.0
 ;; URL: https://github.com/ultronozm/czm-tex-edit.el
-;; Package-Requires: ((emacs "29.1") (auctex "11.86.1") (dynexp "0.1"))
+;; Package-Requires: ((emacs "29.1") (auctex "11.86.1") (dynexp "0.0"))
 ;; Keywords: tex
 
 ;; This program is free software; you can redistribute it and/or modify
