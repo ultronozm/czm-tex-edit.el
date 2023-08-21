@@ -341,6 +341,7 @@ KEY specifies the key to use for the keybinding."
          (key-sequence (concat "C-c t c " key)))
     `(define-key LaTeX-mode-map (kbd ,key-sequence) ',function-name)))
 
+;;;###autoload
 (defmacro czm-tex-edit-define-color-functions-and-bindings (color-key-pairs)
   "Define color functions and keybindings for COLOR-KEY-PAIRS."
   `(progn
@@ -351,13 +352,6 @@ KEY specifies the key to use for the keybinding."
                       ,(czm-tex-edit-create-color-function color)
                       ,(czm-tex-edit-create-color-bindings color key))))
                color-key-pairs)))
-
-;;;###autoload
-(defun czm-tex-edit-textcolor-red (beg end)
-  "Color the region between BEG and END red."
-  (interactive "r")
-  (czm-tex-edit-macro-helper beg end "textcolor{red}"))
-
 
 ;; (defun czm-tex-edit-create-color-bindings-2 (color key)
 ;;   "Create keybindings for coloring text with COLOR.
