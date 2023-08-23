@@ -334,15 +334,15 @@ TYPE specifies the type of macro to use."
        (interactive "r")
        (czm-tex-edit-macro-helper beg end ,(concat "textcolor{" color "}")))))
 
-(defun czm-tex-edit-create-color-bindings (color key)
+(defun czm-tex-edit-create-color-bindings (color key prefix)
   "Create keybindings for coloring text with COLOR.
 KEY specifies the key to use for the keybinding."
   (let* ((function-name (intern (concat "czm-tex-edit-textcolor-" color)))
-         (key-sequence (concat "C-c t c " key)))
+         (key-sequence (concat prefix " " key)))
     `(define-key LaTeX-mode-map (kbd ,key-sequence) ',function-name)))
 
 ;;;###autoload
-(defmacro czm-tex-edit-define-color-functions-and-bindings (color-key-pairs)
+(defmacro czm-tex-edit-define-color-functions-and-bindings (prefix color-key-pairs)
   "Define color functions and keybindings for COLOR-KEY-PAIRS."
   `(progn
      ,@(mapcar (lambda (pair)
@@ -350,7 +350,7 @@ KEY specifies the key to use for the keybinding."
                        (key (cdr pair)))
                    `(progn
                       ,(czm-tex-edit-create-color-function color)
-                      ,(czm-tex-edit-create-color-bindings color key))))
+                      ,(czm-tex-edit-create-color-bindings color key prefix))))
                color-key-pairs)))
 
 ;; (defun czm-tex-edit-create-color-bindings-2 (color key)
