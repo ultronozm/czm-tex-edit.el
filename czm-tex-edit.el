@@ -566,7 +566,7 @@ Currently only supports $...$ and \begin{...} \end{...} blocks."
       (replace-match "\n\\\\end{equation*}" t))))
 
 ;;;###autoload
-(defun czm-tex-edit-fix-file ()
+(defun czm-tex-edit-fix-buffer ()
   "Put LaTeX buffer in the format you like.
 Replace \\[...\\] and $$...$$ with equation* blocks.
 Make sure each \\begin{...} and \\end{...} block appears on its own line."
