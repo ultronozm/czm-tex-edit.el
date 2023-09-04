@@ -105,32 +105,40 @@ should be numbered."
 (defun czm-tex-edit-make-equation-align ()
   "Toggle LaTeX environment between `equation' and `align'."
   (interactive)
-  (save-excursion
-    (when (texmathp)
-      (preview-clearout-at-point)
-      (cond
-       ((equal (car texmathp-why) '"\\[")
-        (goto-char (cdr texmathp-why))
-        (delete-char 2)
-        (push-mark)
-        (search-forward "\\]")
-        (delete-region (match-beginning 0) (match-end 0))
-        (exchange-point-and-mark)
-        (LaTeX-insert-environment "align*"))
-       ((equal (car texmathp-why) '"$")
-        (goto-char (cdr texmathp-why))
-        (delete-char 1)
-        (push-mark)
-        (search-forward "$")
-        (delete-region (match-beginning 0) (match-end 0))
-        (exchange-point-and-mark)
-        (LaTeX-insert-environment "align*"))
-       ((equal (car texmathp-why) "equation*")
-        (LaTeX-modify-environment "align*"))
-       ((equal (car texmathp-why) "equation")
-        (LaTeX-modify-environment "align*"))
-       ((equal (car texmathp-why) "align*")
-        (LaTeX-modify-environment "equation*"))))))
+  (czm-tex-edit--make-equation-helper "align"))
+
+;;;###autoload
+(defun czm-tex-edit-make-equation-multline ()
+  "Toggle LaTeX environment between `equation' and `multline'."
+  (interactive)
+  (czm-tex-edit--make-equation-helper "multline"))
+
+(defun czm-tex-edit--make-equation-helper (type)
+  (let ((type* (concat type "*")))
+    (save-excursion
+      (when (texmathp)
+        (preview-clearout-at-point)
+        (cond
+         ((equal (car texmathp-why) '"\\[")
+          (goto-char (cdr texmathp-why))
+          (delete-char 2)
+          (push-mark)
+          (search-forward "\\]")
+          (delete-region (match-beginning 0) (match-end 0))
+          (exchange-point-and-mark)
+          (LaTeX-insert-environment type*))
+         ((equal (car texmathp-why) '"$")
+          (goto-char (cdr texmathp-why))
+          (delete-char 1)
+          (push-mark)
+          (search-forward "$")
+          (delete-region (match-beginning 0) (match-end 0))
+          (exchange-point-and-mark)
+          (LaTeX-insert-environment type*))
+         ((equal (car texmathp-why) type*)
+          (LaTeX-modify-environment "equation*"))
+         ((member (car texmathp-why) '("equation" "equation*" "align" "align*" "multline" "multline*"))
+          (LaTeX-modify-environment type*)))))))
 
 
 ;;;###autoload
