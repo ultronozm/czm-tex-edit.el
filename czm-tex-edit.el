@@ -114,6 +114,8 @@ should be numbered."
   (czm-tex-edit--make-equation-helper "multline"))
 
 (defun czm-tex-edit--make-equation-helper (type)
+  "Helper function for between equation/align/multline envs.
+TYPE is either \"align\" or \"multline\"."
   (let ((type* (concat type "*")))
     (save-excursion
       (when (texmathp)
@@ -344,14 +346,15 @@ TYPE specifies the type of macro to use."
 
 (defun czm-tex-edit-create-color-bindings (color key prefix)
   "Create keybindings for coloring text with COLOR.
-KEY specifies the key to use for the keybinding."
+PREFIX and KEY specify the key to use for the keybinding."
   (let* ((function-name (intern (concat "czm-tex-edit-textcolor-" color)))
          (key-sequence (concat prefix " " key)))
     `(define-key LaTeX-mode-map (kbd ,key-sequence) ',function-name)))
 
 ;;;###autoload
 (defmacro czm-tex-edit-define-color-functions-and-bindings (prefix color-key-pairs)
-  "Define color functions and keybindings for COLOR-KEY-PAIRS."
+  "Define color functions and keybindings for COLOR-KEY-PAIRS.
+PREFIX specifies the prefix to use for the keybindings."
   `(progn
      ,@(mapcar (lambda (pair)
                  (let ((color (car pair))
