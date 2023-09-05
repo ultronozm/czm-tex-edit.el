@@ -167,8 +167,8 @@ TYPE is either \"align\" or \"multline\"."
         (kill-line))
       (goto-char (point-min))
       (while (re-search-forward
-               (regexp-opt '("\\begin{equation}" "\\begin{align}"))
-               nil t)
+              (regexp-opt '("\\begin{equation}" "\\begin{align}"))
+              nil t)
         (replace-match "")
         (kill-line))
       (goto-char (point-min))
@@ -178,10 +178,10 @@ TYPE is either \"align\" or \"multline\"."
       (goto-char (point-min))
       (insert "\\begin{align*}\n")
       (goto-char (point-max))
-      (insert "\\end{align*}\n"))))
-
-
-
+      (insert "\\end{align*}\n")
+      ;; search backwards for most recent \\ and delete that
+      (re-search-backward "\\\\\\\\")
+      (delete-region (point) (+ 2 (point))))))
 
 ;;;###autoload
 (defun czm-tex-edit-make-equation-inline ()
