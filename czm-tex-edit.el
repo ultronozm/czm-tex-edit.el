@@ -90,14 +90,17 @@ should be numbered."
   (delete-char num-chars)
   (when (or (equal env "equation") (equal env "equation*"))
     (kill-line))
-  (push-mark)
-  (search-forward search-str)
-  (delete-region (match-beginning 0) (match-end 0))
-  (when (equal env "$")
-    (while (looking-at-p czm-tex-edit-punctuation-string)
-      (forward-char)))
-  (exchange-point-and-mark)
-  (LaTeX-insert-environment (if numbered "equation" "equation*"))
+  (let ((end (save-excursion
+               (search-forward search-str)
+               (delete-region (match-beginning 0) (match-end 0))
+               (when (equal env "$")
+                 (while (looking-at-p czm-tex-edit-punctuation-string)
+                   (forward-char)))
+               (point))))
+    ;; set the mark to end, and activate the region:
+    (push-mark end)
+    (activate-mark)
+    (LaTeX-insert-environment (if numbered "equation" "equation*")))
   (when numbered
     (czm-tex-edit-add-label)))
 
