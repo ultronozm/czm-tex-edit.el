@@ -90,17 +90,15 @@ should be numbered."
   (delete-char num-chars)
   (when (or (equal env "equation") (equal env "equation*"))
     (kill-line))
-  (let ((end (save-excursion
+  (push-mark (save-excursion
                (search-forward search-str)
                (delete-region (match-beginning 0) (match-end 0))
                (when (equal env "$")
                  (while (looking-at-p czm-tex-edit-punctuation-string)
                    (forward-char)))
-               (point))))
-    ;; set the mark to end, and activate the region:
-    (push-mark end)
-    (activate-mark)
-    (LaTeX-insert-environment (if numbered "equation" "equation*")))
+               (point)))
+  (activate-mark)
+  (LaTeX-insert-environment (if numbered "equation" "equation*"))
   (when numbered
     (czm-tex-edit-add-label)))
 
@@ -131,6 +129,7 @@ TYPE is either \"align\" or \"multline\"."
           (search-forward "\\]")
           (delete-region (match-beginning 0) (match-end 0))
           (exchange-point-and-mark)
+          (activate-mark)
           (LaTeX-insert-environment type*))
          ((equal (car texmathp-why) '"$")
           (goto-char (cdr texmathp-why))
@@ -139,6 +138,7 @@ TYPE is either \"align\" or \"multline\"."
           (search-forward "$")
           (delete-region (match-beginning 0) (match-end 0))
           (exchange-point-and-mark)
+          (activate-mark)
           (LaTeX-insert-environment type*))
          ((equal (car texmathp-why) type*)
           (LaTeX-modify-environment "equation*"))
