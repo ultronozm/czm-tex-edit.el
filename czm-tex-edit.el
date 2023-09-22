@@ -307,6 +307,11 @@ equation."
   (interactive "r")
   (czm-tex-edit-macro-helper beg end "emph"))
 
+(defun czm-tex-edit-alertify (beg end)
+  "Emphasize the region between BEG and END."
+  (interactive "r")
+  (czm-tex-edit-macro-helper beg end "alert"))
+
 ;;;###autoload
 (defun czm-tex-edit-bold (beg end)
   "Bold the region between BEG and END."
