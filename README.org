@@ -31,7 +31,7 @@ Download this repository, install using =M-x package-install-file= (or package-v
         ("C-c i" . czm-tex-edit-make-equation-inline)
         ("C-c w" . czm-tex-edit-make-equation-align)
         ("s-<return>" . czm-tex-edit-return))
-  :init
+  :config
   (czm-tex-edit-define-color-functions-and-bindings
    "C-c t c"
    (("red" . "r") ("green" . "g") ("blue" . "b") ("yellow" . "y") ("orange" . "o") ("purple" . "p") ("black" . "k") ("white" . "w") ("cyan" . "c") ("magenta" . "m") ("lime" . "l") ("teal" . "t") ("violet" . "v") ("pink" . "i") ("brown" . "n") ("gray" . "a") ("darkgreen" . "d") ("lightblue" . "h") ("lavender" . "e") ("maroon" . "u") ("beige" . "j") ("indigo" . "x") ("turquoise" . "q") ("gold" . "f") ("silver" . "s") ("bronze" . "z"))))
