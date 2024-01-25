@@ -5,7 +5,7 @@
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
 ;; Version: 0.0
 ;; URL: https://github.com/ultronozm/czm-tex-edit.el
-;; Package-Requires: ((emacs "29.1") (auctex "11.86.1") (dynexp "0.0"))
+;; Package-Requires: ((emacs "29.1") (dynexp "0.0"))
 ;; Keywords: tex
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -215,7 +215,7 @@ text."
         (goto-char (point-max))
         (insert "\n")
         (backward-char)
-        (while (looking-back czm-tex-edit-punctuation-string)
+        (while (looking-back czm-tex-edit-punctuation-string 5)
           (backward-char))
         (insert "$")
         (while (> (count-lines (point-min) (point-max)) 1)
@@ -553,7 +553,7 @@ Currently only supports $...$ and \begin{...} \end{...} blocks."
       (let ((_beg (car math-region))
             (end (cdr math-region)))
         (goto-char end)
-        (unless (looking-back "\\$")
+        (unless (looking-back "\\$" 1)
           (forward-char)))
     (LaTeX-insert-item)))
 
