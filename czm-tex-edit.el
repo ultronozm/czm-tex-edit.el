@@ -292,12 +292,24 @@ equation."
                   (LaTeX-find-matching-begin)
                   (point)))
          (end (search-backward "&" bound t)))
-    (when end
-      (goto-char start)
-      (let ((text-to-copy (buffer-substring-no-properties (1+ end) start)))
-        (insert "\\\\\n")
+    (if end
+        (let ((text-to-copy (buffer-substring-no-properties (1+ end) start)))
+          (goto-char start)
+          (insert "\\\\\n")
+          (save-excursion
+            (insert "&" text-to-copy " <++>"))
+          ;; (LaTeX-indent-line)
+          ; this doesn't work as it should -- need to figure out a way
+          ; to execute a "next" command?
+          )
+      (let ((text-to-copy (buffer-substring-no-properties
+                           (save-excursion
+                             (goto-char bound)
+                             (forward-line 1)
+                             (point))
+                           start)))
         (save-excursion
-          (insert "&" text-to-copy " <++>"))))))
+          (insert "&= " (string-trim text-to-copy) " <++>"))))))
 
 
 
