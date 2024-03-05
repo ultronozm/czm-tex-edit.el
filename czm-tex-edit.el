@@ -660,5 +660,26 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
           (unless (looking-at-p "[[:space:]]*$")
             (insert "\n")))))))
 
+;;;###autoload
+(defun czm-tex-edit-fix-latex-hyperref-section-warnings ()
+  "Wrap math expressions in a section title with \\texorpdfstring."
+  (interactive)
+  (when (looking-at-p "\\(\\(sub\\)?section\\|chapter\\|part\\){")
+    (let ((start (point))
+          (end (progn (forward-list) (point))))
+      (goto-char end)
+      (while (re-search-backward "\\$\\([^$]+\\)\\$" start t)
+        (let ((beg (match-beginning 0))
+              (math (match-string 0))
+              replacement)
+          (save-match-data
+            (unless (looking-back "\\texorpdfstring{[^}]*" (line-beginning-position))
+              (let ((plain (read-string
+                            (format "Plain text for math expression %s: " math))))
+                (setq replacement (concat "\\texorpdfstring{" math "}{" plain "}")))))
+          (when replacement
+            (replace-match replacement nil t)
+            (goto-char beg)))))))
+
 (provide 'czm-tex-edit)
 ;;; czm-tex-edit.el ends here
