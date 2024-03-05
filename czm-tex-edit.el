@@ -617,15 +617,20 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
     ;; are in math mode according to texmathp.
     (goto-char (point-min))
     (while (re-search-forward "\\$\\$" nil t)
-      (when (and (texmathp)
-                 ;; check whether % appears between point and line beginning.
-                 ;; if so, we are in a comment and should ignore this match.
-                 ;; first, remember the current value of point
-                 (save-excursion
-                   (save-match-data
-                     (let ((p (point)))
-                       (beginning-of-line)
-                       (not (search-forward "%" p t))))))
+      (when (and ;; (texmathp)
+             (let ((face (plist-get (text-properties-at (point))
+                                    'face)))
+               (or (eq face 'font-latex-math-face)
+                   (and (listp face)
+                        (memq 'font-latex-math-face face))))
+             ;; check whether % appears between point and line beginning.
+             ;; if so, we are in a comment and should ignore this match.
+             ;; first, remember the current value of point
+             (save-excursion
+               (save-match-data
+                 (let ((p (point)))
+                   (beginning-of-line)
+                   (not (search-forward "%" p t))))))
         (replace-match "\\\\begin{equation*}")
         (re-search-forward "\\$\\$" nil t)
         (replace-match "\\\\end{equation*}")))
