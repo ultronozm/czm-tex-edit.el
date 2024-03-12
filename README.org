@@ -30,7 +30,8 @@ Download this repository, install using =M-x package-install-file= (or package-v
         ("C-c e" . czm-tex-edit-make-equation-numbered)
         ("C-c i" . czm-tex-edit-make-equation-inline)
         ("C-c w" . czm-tex-edit-make-equation-align)
-        ("s-<return>" . czm-tex-edit-return))
+        ("s-<return>" . czm-tex-edit-return)
+        ("$" . czm-tex-edit-insert-dollar-or-wrap-region))
   :config
   (czm-tex-edit-define-color-functions-and-bindings
    "C-c t c"

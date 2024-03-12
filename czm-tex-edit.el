@@ -5,7 +5,7 @@
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
 ;; Version: 0.0
 ;; URL: https://github.com/ultronozm/czm-tex-edit.el
-;; Package-Requires: ((emacs "29.1") (dynexp "0.0"))
+;; Package-Requires: ((emacs "29.1") (dynexp "0.0") (auctex))
 ;; Keywords: tex
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -78,7 +78,7 @@ Also, save label to kill ring as an \\eqref{} command."
   :type 'regexp)
 
 (defun czm-tex-edit--handle-env (env pos num-chars search-str numbered)
-  "Helper function for czm-tex-edit-make-equation-numbered.
+  "Helper function for `czm-tex-edit-make-equation-numbered'.
 
 Remove part of the environment string and insert a numbered or
 unnumbered LaTeX equation environment at POS.  ENV specifies the
@@ -669,7 +669,9 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
 (defun czm-tex-edit-fix-latex-hyperref-section-warnings ()
   "Wrap math expressions in a section title with \\texorpdfstring."
   (interactive)
-  (when (looking-at-p "\\(\\(sub\\)?section\\|chapter\\|part\\){")
+  (when (looking-at-p
+         (regexp-opt
+          '("\\section" "\\subsection" "\\subsubsection" "\\chapter" "\\part")))
     (let ((start (point))
           (end (progn (forward-list) (point))))
       (goto-char end)
@@ -683,8 +685,38 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
                             (format "Plain text for math expression %s: " math))))
                 (setq replacement (concat "\\texorpdfstring{" math "}{" plain "}")))))
           (when replacement
-            (replace-match replacement nil t)
-            (goto-char beg)))))))
+            (replace-match replacement t t)
+            (goto-char beg))))
+      ;; now same thing, but for \(...\) rather than $...$:
+      ;; (goto-char end)
+      ;; (while (re-search-backward "\\\\\\([^\\]+\\\\\\)" start t)
+      ;;   (let ((beg (match-beginning 0))
+      ;;         (math (match-string 0))
+      ;;         replacement)
+      ;;     (save-match-data
+      ;;       (unless (looking-back "\\texorpdfstring{[^}]*" (line-beginning-position))
+      ;;         (let ((plain (read-string
+      ;;                       (format "Plain text for math expression %s: " math))))
+      ;;           (setq replacement (concat "\\texorpdfstring{" math "}{" plain "}")))))
+      ;;     (when replacement
+      ;;       (replace-match replacement nil t)
+      ;;       (goto-char beg))))
+      )))
+
+
+;;;###autoload
+(defun czm-tex-edit-insert-dollar-or-wrap-region ()
+  "Insert $ or surround region (if active) with $'s.
+Defers to `TeX-insert-dollar' if no region is active."
+  (interactive)
+  (if (use-region-p)
+      (let ((start (region-beginning))
+            (end (region-end)))
+        (goto-char end)
+        (insert "$")
+        (goto-char start)
+        (insert "$"))
+    (TeX-insert-dollar)))
 
 (provide 'czm-tex-edit)
 ;;; czm-tex-edit.el ends here
