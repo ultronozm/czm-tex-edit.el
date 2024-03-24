@@ -355,7 +355,8 @@ TYPE specifies the type of macro to use."
              (dynexp-split-macro beg)))
         (dolist (b beginnings)
           (goto-char b)
-          (TeX-fold-macro))))))
+          (when TeX-fold-mode
+            (TeX-fold-macro)))))))
 
 (defun czm-tex-edit-create-color-function (color)
   "Create a function for coloring text with COLOR."
