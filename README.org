@@ -15,6 +15,7 @@ Download this repository, install using =M-x package-install-file= (or package-v
   :bind
   (:map LaTeX-mode-map
         ("C-c t i" . czm-tex-edit-emphasize)
+        ("C-c t a" . czm-tex-edit-alertify)
         ("C-c t b" . czm-tex-edit-bold)
         ("C-c t l" . czm-tex-edit-underline)
         ("C-c t u" . czm-tex-edit-unemphasize)
@@ -30,6 +31,7 @@ Download this repository, install using =M-x package-install-file= (or package-v
         ("C-c e" . czm-tex-edit-make-equation-numbered)
         ("C-c i" . czm-tex-edit-make-equation-inline)
         ("C-c w" . czm-tex-edit-make-equation-align)
+        ("C-c q" . czm-tex-edit-make-equation-multline)
         ("s-<return>" . czm-tex-edit-return)
         ("$" . czm-tex-edit-insert-dollar-or-wrap-region))
   :config
