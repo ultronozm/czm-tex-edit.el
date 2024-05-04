@@ -719,5 +719,17 @@ Defers to `TeX-insert-dollar' if no region is active."
         (insert "$"))
     (TeX-insert-dollar)))
 
+;;;###autoload
+(defun czm-tex-edit-insert-quote-or-wrap-region ()
+  (interactive)
+  (if (use-region-p)
+      (let ((start (region-beginning))
+            (end (region-end)))
+        (goto-char end)
+        (TeX-insert-quote nil)
+        (goto-char start)
+        (TeX-insert-quote nil))
+    (TeX-insert-quote nil)))
+
 (provide 'czm-tex-edit)
 ;;; czm-tex-edit.el ends here
