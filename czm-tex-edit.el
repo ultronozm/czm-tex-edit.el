@@ -706,10 +706,10 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
 
 
 ;;;###autoload
-(defun czm-tex-edit-insert-dollar-or-wrap-region ()
+(defun czm-tex-edit-insert-dollar-or-wrap-region (arg)
   "Insert $ or surround region (if active) with $'s.
 Defers to `TeX-insert-dollar' if no region is active."
-  (interactive)
+  (interactive "*P")
   (if (use-region-p)
       (let ((start (region-beginning))
             (end (region-end)))
@@ -717,7 +717,7 @@ Defers to `TeX-insert-dollar' if no region is active."
         (insert "$")
         (goto-char start)
         (insert "$"))
-    (TeX-insert-dollar)))
+    (TeX-insert-dollar arg)))
 
 ;;;###autoload
 (defun czm-tex-edit-insert-quote-or-wrap-region ()
