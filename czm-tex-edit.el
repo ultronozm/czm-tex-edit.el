@@ -491,7 +491,7 @@ PREFIX specifies the prefix to use for the keybindings."
 
 ;;;###autoload
 (defun czm-tex-edit-fractionify-region (beg end)
-  "Turn a region between BEG and END into a \frac{...}{...}."
+  "Turn a region between BEG and END into a \"\\frac\" LaTeX command."
   (interactive "r")
   (let ((contents (buffer-substring beg end)) (num) (den))
     (with-temp-buffer
@@ -539,7 +539,7 @@ If ARG is non-nil, then fill and indent afterwards."
 
 (defun czm-tex-edit--texmathp-region ()
   "Get the math region containing point in a LaTeX buffer.
-Currently only supports $...$ and \begin{...} \end{...} blocks."
+Currently only supports $...$ and begin/end blocks."
   (interactive)
   (when (texmathp)
     (let* ((math-start (cdr texmathp-why))
@@ -708,7 +708,10 @@ Make sure each \\begin{...} and \\end{...} block appears on its own line."
 ;;;###autoload
 (defun czm-tex-edit-insert-dollar-or-wrap-region (arg)
   "Insert $ or surround region (if active) with $'s.
-Defers to `TeX-insert-dollar' if no region is active."
+Defers to `TeX-insert-dollar' if no region is active.
+
+See `TeX-insert-dollar-action' for more information on the
+behavior, as well as the role of ARG."
   (interactive "*P")
   (if (use-region-p)
       (let ((start (region-beginning))
@@ -721,6 +724,7 @@ Defers to `TeX-insert-dollar' if no region is active."
 
 ;;;###autoload
 (defun czm-tex-edit-insert-quote-or-wrap-region ()
+  "Insert quote or surround region (if active) with quotes."
   (interactive)
   (if (use-region-p)
       (let ((start (region-beginning))
