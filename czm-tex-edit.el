@@ -5,7 +5,7 @@
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
 ;; Version: 0.0
 ;; URL: https://github.com/ultronozm/czm-tex-edit.el
-;; Package-Requires: ((emacs "29.1") (dynexp "0.0") (auctex))
+;; Package-Requires: ((emacs "29.1") (dynexp "0.0") (auctex) (tex-parens "0.6"))
 ;; Keywords: tex
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 (require 'latex)
 (require 'preview)
 (require 'dynexp)
+(require 'tex-parens)
 
 ;;;###autoload
 (defun czm-tex-edit-make-equation-numbered ()
@@ -560,7 +561,7 @@ Currently only supports $...$ and begin/end blocks."
 
 ;;;###autoload
 (defun czm-tex-edit-return ()
-  "Exits from equation environments, otherwise behaves like RET."
+  "Exit from current equation or jump to end of next equation."
   (interactive)
   (if-let ((math-region (czm-tex-edit--texmathp-region)))
       (let ((_beg (car math-region))
@@ -568,7 +569,11 @@ Currently only supports $...$ and begin/end blocks."
         (goto-char end)
         (unless (looking-back "\\$" 1)
           (forward-char)))
-    (LaTeX-insert-item)))
+    (add-to-list 'preview-auto-reveal-commands #'czm-tex-edit-return)
+    (tex-parens-forward-list)
+    (tex-parens-backward-down-list)
+    (unless (char-equal (char-after) ?$)
+      (backward-char))))
 
 ;;;###autoload
 (defun czm-tex-edit-delete-commented-lines ()
