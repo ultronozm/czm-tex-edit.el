@@ -536,7 +536,7 @@ If ARG is non-nil, then fill and indent afterwards."
         (insert "\\begin{equation*}")
         (newline)
         (when arg
-            (LaTeX-fill-environment nil)))))))
+          (LaTeX-fill-environment nil)))))))
 
 (defun czm-tex-edit--texmathp-region ()
   "Get the math region containing point in a LaTeX buffer.
