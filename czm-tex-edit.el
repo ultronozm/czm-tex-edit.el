@@ -146,6 +146,63 @@ TYPE is either \"align\" or \"multline\"."
          ((member (car texmathp-why) '("equation" "equation*" "align" "align*" "multline" "multline*"))
           (LaTeX-modify-environment type*)))))))
 
+;;;###autoload
+(defun czm-tex-edit-toggle-left-equations ()
+  "Toggle left-aligned equations in LaTeX documents.
+This function adds nccmath package if needed and toggles the
+\\everydisplay{\\fleqn} directive in the preamble."
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (unless (re-search-forward "\\\\documentclass\\|\\\\begin{document}"
+                                 nil t)
+        (user-error "Not a proper LaTeX document"))
+      (goto-char (point-min))
+      (unless (re-search-forward "\\\\begin{document}" nil t)
+        (user-error "Could not find \\begin{document}"))
+      (goto-char (match-beginning 0))
+      (beginning-of-line)
+      (let ((begin-document-pos (point)))
+        (goto-char (point-min))
+        (let ((nccmath-loaded
+               (re-search-forward "\\\\usepackage\\(\\[.*\\]\\)?{nccmath}"
+                                  begin-document-pos t)))
+          (unless nccmath-loaded
+            (goto-char begin-document-pos)
+            (forward-line -1)
+            (end-of-line)
+            (insert "\n\\usepackage{nccmath}\n")
+            (setq begin-document-pos (point))))
+        (goto-char (point-min))
+        (let ((fleqn-commented nil))
+          (when (re-search-forward "^\\s-*%+\\s-*\\\\everydisplay{\\\\fleqn}"
+                                   begin-document-pos t)
+            (setq fleqn-commented (match-beginning 0)))
+          (goto-char (point-min))
+          (let ((fleqn-active
+                 (re-search-forward
+                  "^\\s-*\\\\everydisplay{\\\\fleqn}" begin-document-pos t)))
+            (cond
+             (fleqn-commented
+              (goto-char fleqn-commented)
+              (beginning-of-line)
+              (if (looking-at "\\s-*%+\\s-*")
+                  (replace-match ""))
+              (message "Left-aligned equations enabled"))
+             (fleqn-active
+              (goto-char fleqn-active)
+              (beginning-of-line)
+              (insert "% ")
+              (message "Left-aligned equations disabled"))
+             (t
+              (goto-char begin-document-pos)
+              (insert "\\everydisplay{\\fleqn}\n")
+              (message "Left-aligned equations enabled"))))))))
+  (when (and (boundp 'preview-auto-mode) preview-auto-mode)
+    (preview-clearout-buffer)
+    (preview-buffer)))
 
 ;;;###autoload
 (defun czm-tex-edit-merge-equations-to-align (beg end)
