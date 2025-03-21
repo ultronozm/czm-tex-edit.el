@@ -572,8 +572,9 @@ Currently only supports $...$ and begin/end blocks."
     (add-to-list 'preview-auto-reveal-commands #'czm-tex-edit-return)
     (tex-parens-forward-list)
     (tex-parens-backward-down-list)
-    (unless (char-equal (char-after) ?$)
-      (backward-char))))
+    (when (looking-back (rx (seq line-start (* space))) (line-beginning-position))
+      (forward-line -1)
+      (end-of-line))))
 
 ;;;###autoload
 (defun czm-tex-edit-delete-commented-lines ()
