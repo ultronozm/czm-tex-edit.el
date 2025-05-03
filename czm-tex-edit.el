@@ -73,7 +73,7 @@ Also, save label to kill ring as an \\eqref{} command."
         (kill-new (concat "\\eqref" (buffer-substring beg end)))))))
 
 (defcustom czm-tex-edit-punctuation-string
-  "[\\.|,|;|!|?]"
+  "[.,;:!?]"
   "Regexp for matching punctuation characters."
   :group 'czm-tex-edit
   :type 'regexp)
