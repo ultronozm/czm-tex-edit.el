@@ -242,49 +242,44 @@ This function adds nccmath package if needed and toggles the
       (delete-region (point) (+ 2 (point))))))
 
 ;;;###autoload
-(defun czm-tex-edit-make-equation-inline ()
+(defun czm-tex-edit-make-equation-inline (&optional delims)
   "Convert LaTeX equation environment at point to inlined math.
 Format LaTeX environment at point by surrounding the math
 environment with dollar signs, removing any leading or trailing
 text."
   (interactive)
+  (unless delims
+    (setq delims '("$" . "$")))
   (when (texmathp)
     (preview-clearout-at-point)
-    (let ((cur (point-marker)) beg end)
-      (save-excursion
-        (LaTeX-find-matching-end)
-        (setq end (line-beginning-position 2))
-        (goto-char cur)
-        (LaTeX-find-matching-begin)
-        (setq beg (point)))
-      (save-restriction
-        (narrow-to-region beg end)
-        (goto-char (point-min))
-        (kill-line 1)
-        (beginning-of-line-text)
-        (delete-region (point-min) (point))
-        (goto-char (point-max))
-        (forward-line -2)
-        (end-of-line)
-        (delete-region (point) (point-max))
-        (whitespace-cleanup)
-        (goto-char (point-min))
-        (insert "$")
-        (goto-char (point-max))
-        (insert "\n")
-        (backward-char)
-        (while (looking-back czm-tex-edit-punctuation-string 5)
-          (backward-char))
-        (insert "$")
-        (while (> (count-lines (point-min) (point-max)) 1)
-          (join-line))
-        (current-buffer))
-      (join-line)
-      (goto-char cur))))
-
-
-
-
+    (save-excursion
+      (let ((beg (save-excursion
+                   (LaTeX-find-matching-begin)
+                   (point)))
+            (end (save-excursion
+                   (LaTeX-find-matching-end)
+                   (line-beginning-position 2))))
+        (save-restriction
+          (narrow-to-region beg end)
+          (goto-char (point-min))
+          (kill-line 1)
+          (beginning-of-line-text)
+          (delete-region (point-min) (point))
+          (goto-char (point-max))
+          (end-of-line -1)
+          (delete-region (point) (point-max))
+          (whitespace-cleanup)
+          (goto-char (point-min))
+          (insert (car delims))
+          (goto-char (point-max))
+          (insert "\n")
+          (backward-char)
+          (while (looking-back czm-tex-edit-punctuation-string 5)
+            (backward-char))
+          (insert (cdr delims))
+          (while (> (count-lines (point-min) (point-max)) 1)
+            (join-line))))
+      (join-line))))
 
 ;;;###autoload
 (defun czm-tex-edit-repeat-most-recent-equation (&optional n)
