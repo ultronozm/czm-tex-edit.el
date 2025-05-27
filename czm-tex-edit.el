@@ -791,6 +791,7 @@ behavior, as well as the role of ARG."
         (TeX-insert-quote nil)
         (goto-char start)
         (TeX-insert-quote nil))
+    (expand-abbrev)
     (TeX-insert-quote nil)))
 
 (provide 'czm-tex-edit)
