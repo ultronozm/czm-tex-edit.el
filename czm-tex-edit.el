@@ -548,7 +548,7 @@ Currently only supports $...$ and begin/end blocks."
 (defun czm-tex-edit-return ()
   "Exit from current equation or jump to end of next equation."
   (interactive)
-  (if-let ((math-region (czm-tex-edit--texmathp-region)))
+  (if-let* ((math-region (czm-tex-edit--texmathp-region)))
       (let ((_beg (car math-region))
             (end (cdr math-region)))
         (goto-char end)
