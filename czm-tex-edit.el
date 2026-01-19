@@ -526,20 +526,23 @@ Currently only supports $...$ and begin/end blocks."
   (interactive)
   (when (texmathp)
     (let* ((math-start (cdr texmathp-why))
+           (env (car texmathp-why))
            (math-end (save-excursion
                        (goto-char math-start)
-                       (cond
-                        ;; Toggle math mode
-                        ((looking-at-p "\\$")
-                         (search-forward "$" nil t 2))
-                        ;; Environment math mode
-                        (t
-                         (end-of-line)
-                         (LaTeX-find-matching-end)
-                         (end-of-line)))
+                       (pcase env
+                         ("$"
+                          (search-forward "$" nil t 2))
+                         ("$$"
+                          (search-forward "$$" nil t 2))
+                         ("\\("
+                          (search-forward "\\)" nil t))
+                         ("\\["
+                          (search-forward "\\]" nil t))
+                         (_ (end-of-line)
+                            (LaTeX-find-matching-end)
+                            (end-of-line)))
                        (point))))
       (cons math-start math-end))))
-
 
 ;;;###autoload
 (defun czm-tex-edit-return ()
