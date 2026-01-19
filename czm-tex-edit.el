@@ -282,8 +282,8 @@ This function adds nccmath package if needed and toggles the
           (save-excursion
             (insert "&" text-to-copy " <++>"))
           ;; (LaTeX-indent-line)
-          ; this doesn't work as it should -- need to figure out a way
-          ; to execute a "next" command?
+          ;; this doesn't work as it should -- need to figure out a way
+          ;; to execute a "next" command?
           )
       (let ((text-to-copy (buffer-substring-no-properties
                            (save-excursion
