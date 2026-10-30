@@ -148,58 +148,57 @@ TYPE is either \"align\" or \"multline\"."
 
 ;;;###autoload
 (defun czm-tex-edit-toggle-left-equations ()
-  "Toggle left-aligned equations in LaTeX documents.
-This function adds nccmath package if needed and toggles the
-\\everydisplay{\\fleqn} directive in the preamble."
+  "Toggle left-aligned equations using the document class's fleqn option.
+Set mathindent to zero at the start of the document when enabling.  Remove the legacy
+\\everydisplay{\\fleqn} directive, if present."
   (interactive)
   (save-excursion
     (save-restriction
       (widen)
       (goto-char (point-min))
-      (unless (re-search-forward "\\\\documentclass\\|\\\\begin{document}"
-                                 nil t)
-        (user-error "Not a proper LaTeX document"))
-      (goto-char (point-min))
-      (unless (re-search-forward "\\\\begin{document}" nil t)
+      (unless (re-search-forward "^[ \t]*\\\\begin{document}" nil t)
         (user-error "Could not find \\begin{document}"))
-      (goto-char (match-beginning 0))
-      (beginning-of-line)
-      (let ((begin-document-pos (point)))
-        (goto-char (point-min))
-        (let ((nccmath-loaded
-               (re-search-forward "\\\\usepackage\\(\\[.*\\]\\)?{nccmath}"
-                                  begin-document-pos t)))
-          (unless nccmath-loaded
-            (goto-char begin-document-pos)
-            (forward-line -1)
-            (end-of-line)
-            (insert "\n\\usepackage{nccmath}\n")
-            (setq begin-document-pos (point))))
-        (goto-char (point-min))
-        (let ((fleqn-commented nil))
-          (when (re-search-forward "^\\s-*%+\\s-*\\\\everydisplay{\\\\fleqn}"
-                                   begin-document-pos t)
-            (setq fleqn-commented (match-beginning 0)))
-          (goto-char (point-min))
-          (let ((fleqn-active
-                 (re-search-forward
-                  "^\\s-*\\\\everydisplay{\\\\fleqn}" begin-document-pos t)))
-            (cond
-             (fleqn-commented
-              (goto-char fleqn-commented)
-              (beginning-of-line)
-              (if (looking-at "\\s-*%+\\s-*")
-                  (replace-match ""))
-              (message "Left-aligned equations enabled"))
-             (fleqn-active
-              (goto-char fleqn-active)
-              (beginning-of-line)
-              (insert "% ")
-              (message "Left-aligned equations disabled"))
-             (t
-              (goto-char begin-document-pos)
-              (insert "\\everydisplay{\\fleqn}\n")
-              (message "Left-aligned equations enabled"))))))))
+      (let ((preamble-end (copy-marker (match-beginning 0))))
+        (unwind-protect
+            (progn
+              (goto-char (point-min))
+              (unless (re-search-forward
+                       "^[ \t]*\\\\documentclass[ \t\n]*\\(\\(?:\\[\\([^]]*\\)\\]\\)?\\)"
+                       preamble-end t)
+                (user-error "Could not find \\documentclass"))
+              (let* ((options (save-match-data
+                                (split-string (or (match-string 2) "")
+                                              "," t "[ \t\n]+")))
+                     (enabled (member "fleqn" options)))
+                (replace-match
+                 (if enabled
+                     (let ((remaining (delete "fleqn" options)))
+                       (if remaining
+                           (concat "[" (string-join remaining ",") "]")
+                         ""))
+                   (concat "[" (string-join (append options '("fleqn")) ",") "]"))
+                 t t nil 1)
+                ;; The old everydisplay hook loses equation reference numbers.
+                (goto-char (point-min))
+                (while (re-search-forward
+                        "^[ \t]*\\(?:%+[ \t]*\\)?\\\\everydisplay{\\\\fleqn}[ \t]*\n?"
+                        preamble-end t)
+                  (replace-match "" t t))
+                (goto-char (point-min))
+                (while (re-search-forward
+                        (concat "^[ \t]*"
+                                "\\(?:\\\\AtBeginDocument{\\)?"
+                                "\\\\setlength{\\\\mathindent}{0pt}"
+                                "}?" "[ \t]*\n?")
+                        preamble-end t)
+                  (replace-match "" t t))
+                (unless enabled
+                  (goto-char preamble-end)
+                  ;; amsart resets mathindent in its begin-document hook.
+                  (insert "\\AtBeginDocument{\\setlength{\\mathindent}{0pt}}\n"))
+                (message "Left-aligned equations %s"
+                         (if enabled "disabled" "enabled"))))
+          (set-marker preamble-end nil)))))
   (when (and (boundp 'preview-auto-mode) preview-auto-mode)
     (preview-clearout-buffer)
     (preview-buffer)))
