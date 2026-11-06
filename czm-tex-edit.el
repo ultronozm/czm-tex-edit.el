@@ -5,7 +5,7 @@
 ;; Author: Paul D. Nelson <nelson.paul.david@gmail.com>
 ;; Version: 0.0
 ;; URL: https://github.com/ultronozm/czm-tex-edit.el
-;; Package-Requires: ((emacs "29.1") (dynexp "0.0") (auctex) (tex-parens "0.6"))
+;; Package-Requires: ((emacs "29.1") (dynexp "0.0") (auctex "14.1.0") (tex-parens "0.6"))
 ;; Keywords: tex
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,48 @@
 (require 'preview)
 (require 'dynexp)
 (require 'tex-parens)
+
+;;;###autoload
+(defun czm-tex-edit-toggle-numbered ()
+  "Convert math construct at point to \"equation*\".
+If the math construct is already \"equation*\", then toggle with the
+numbered variant \"equation\"."
+  (interactive)
+  (unless (texmathp) (user-error "Not inside math"))
+  (let ((current (car texmathp-why)))
+    (LaTeX-modify-math
+     (pcase current
+       ("equation*" "equation")
+       ("equation" "equation*")
+       (_ "equation*")))))
+
+;;;###autoload
+(defun czm-tex-edit-toggle-align ()
+  "Toggle math environment at point between \"equation\" and \"align\"."
+  (interactive)
+  (unless (texmathp) (user-error "Not inside math"))
+  (let ((current (car texmathp-why)))
+    (LaTeX-modify-math
+     (pcase current
+       ("align*" "equation*")
+       ("equation*" "align*")
+       ("align" "equation")
+       ("equation" "align")
+       (_ "align*")))))
+
+;;;###autoload
+(defun czm-tex-edit-toggle-multline ()
+  "Toggle math environment at point between \"equation\" and \"multline\"."
+  (interactive)
+  (unless (texmathp) (user-error "Not inside math"))
+  (let ((current (car texmathp-why)))
+    (LaTeX-modify-math
+     (pcase current
+       ("multline*" "equation*")
+       ("equation*" "multline*")
+       ("multline" "equation")
+       ("equation" "multline")
+       (_ "multline*")))))
 
 ;;;###autoload
 (defun czm-tex-edit-make-equation-numbered ()
