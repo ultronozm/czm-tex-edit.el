@@ -34,6 +34,45 @@
 (require 'tex-parens)
 
 ;;;###autoload
+(defun czm-tex-edit-fold-previous-macro (&rest _args)
+  "Fold the macro before point when `TeX-fold-mode' is enabled.
+This can be used as after advice for `LaTeX-insert-item'."
+  (interactive)
+  (when (and (derived-mode-p 'LaTeX-mode)
+             (bound-and-true-p TeX-fold-mode))
+    (save-excursion
+      (backward-word)
+      (TeX-fold-item 'macro))))
+
+;;;###autoload
+(defun czm-tex-edit-fold-yanked-references (&rest _args)
+  "Fold references just inserted by `yank' when `TeX-fold-mode' is enabled.
+Use this as after advice for `yank'.  Only \\ref and \\eqref macros
+within the inserted region are folded."
+  (when (and (derived-mode-p 'LaTeX-mode)
+             (bound-and-true-p TeX-fold-mode))
+    (save-excursion
+      (let ((end (region-end)))
+        (goto-char (region-beginning))
+        (while (re-search-forward "\\\\\\(?:eq\\)?ref{[^}]+}" end t)
+          (save-excursion
+            (goto-char (match-beginning 0))
+            (TeX-fold-item 'macro)))))))
+
+;;;###autoload
+(defun czm-tex-edit-fold-inserted-environment (_environment start end)
+  "Fold a newly inserted environment when `TeX-fold-mode' is enabled.
+Use this in `LaTeX-after-insert-env-hook'.  START is the position
+before \\begin and END is the position before \\end, as provided
+by that hook."
+  (when (and (derived-mode-p 'LaTeX-mode)
+             (bound-and-true-p TeX-fold-mode))
+    (save-excursion
+      (goto-char end)
+      (LaTeX-find-matching-end)
+      (TeX-fold-region start (point)))))
+
+;;;###autoload
 (defun czm-tex-edit-toggle-numbered ()
   "Convert math construct at point to \"equation*\".
 If the math construct is already \"equation*\", then toggle with the
