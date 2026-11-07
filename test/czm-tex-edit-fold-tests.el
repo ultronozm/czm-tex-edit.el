@@ -11,8 +11,7 @@
   `(with-temp-buffer
      (LaTeX-mode)
      (setq-local TeX-fold-macro-spec-list
-                 '(("[r]" ("ref" "eqref")) ("[i]" ("item"))))
-     (setq-local TeX-fold-env-spec-list '(("[q]" ("quote"))))
+                 '(("[r]" ("ref" "eqref"))))
      (setq-local TeX-fold-region-functions nil)
      (TeX-fold-mode 1)
      ,@body))
@@ -25,29 +24,6 @@
           (cl-remove-if-not
            (lambda (overlay) (eq (overlay-get overlay 'category) 'TeX-fold))
            (overlays-in (point-min) (point-max)))))
-
-(ert-deftest czm-tex-edit-fold-inserted-environment ()
-  (czm-tex-edit-test--with-folding
-    (add-hook 'LaTeX-after-insert-env-hook
-              #'czm-tex-edit-fold-inserted-environment nil t)
-    (LaTeX-insert-environment "quote")
-    (should (member (buffer-string) (czm-tex-edit-test--folded-text)))
-    (should (looking-at-p "[ \t]*\n"))
-    (TeX-fold-mode -1)
-    (erase-buffer)
-    (LaTeX-insert-environment "quote")
-    (should-not (czm-tex-edit-test--folded-text))))
-
-(ert-deftest czm-tex-edit-fold-inserted-item ()
-  (advice-add 'LaTeX-insert-item :after #'czm-tex-edit-fold-previous-macro)
-  (unwind-protect
-      (czm-tex-edit-test--with-folding
-        (insert "\\begin{itemize}\n\n\\end{itemize}")
-        (goto-char (point-min))
-        (forward-line 1)
-        (LaTeX-insert-item)
-        (should (member "\\item" (czm-tex-edit-test--folded-text))))
-    (advice-remove 'LaTeX-insert-item #'czm-tex-edit-fold-previous-macro)))
 
 (ert-deftest czm-tex-edit-fold-yanked-references ()
   (advice-add 'yank :after #'czm-tex-edit-fold-yanked-references)

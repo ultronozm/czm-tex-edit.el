@@ -59,21 +59,15 @@ numbered toggle switches between =equation= and =equation*=; other
 math constructs become =equation*=.  These commands do not insert labels.
 
 * Folding inserted text
-The following optional helpers fold inserted text only when =TeX-fold-mode=
-is enabled.  They preserve point and do not install hooks or advice on
-their own:
+The optional =czm-tex-edit-fold-yanked-references= helper folds references
+inserted by =yank= when =TeX-fold-mode= is enabled.  It preserves point
+and does not install advice on its own:
 
 #+begin_src elisp
-(add-hook 'LaTeX-after-insert-env-hook
-          #'czm-tex-edit-fold-inserted-environment)
-(advice-add 'LaTeX-insert-item :after #'czm-tex-edit-fold-previous-macro)
 (advice-add 'yank :after #'czm-tex-edit-fold-yanked-references)
 #+end_src
 
-The environment helper folds the whole inserted environment, including
-configured macros inside it.  The yank helper folds each =\\ref= or
+The helper folds each =\\ref= or
 =\\eqref= in the actual inserted region, including when a prefix argument
-exchanges point and mark.  The item helper folds the macro before point.
-If you want all macros inserted by =TeX-insert-macro= to fold automatically,
-AUCTeX already provides =TeX-fold-auto=; that also covers ordinary
-=LaTeX-insert-item= calls.
+exchanges point and mark.  For macros inserted by =TeX-insert-macro=,
+AUCTeX provides the =TeX-fold-auto= option.
