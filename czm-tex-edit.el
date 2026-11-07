@@ -34,6 +34,63 @@
 (require 'tex-parens)
 
 ;;;###autoload
+(defun czm-tex-edit-copy-region-to-zulip (beg end)
+  "Copy the region from BEG to END as Zulip math to the kill ring.
+Convert $...$ to $$...$$ and equation* environments to fenced math
+blocks.  Convert paired LaTeX double quotes in prose to ordinary
+double quotes, leaving quotes and primes within math, escaped dollars
+and existing double dollars alone.
+
+Leave the source buffer and point unchanged.  Select complete math
+expressions in ordinary prose; comments and verbatim text are not parsed."
+  (interactive "r")
+  (require 'subr-x)
+  (let ((text (buffer-substring-no-properties beg end)))
+    (kill-new
+     (with-temp-buffer
+       (insert text)
+       (goto-char (point-min))
+       (let (math quote-start)
+         ;; Consume escaped characters together, so \$ is not a delimiter.
+         (while (re-search-forward
+                 "\\\\begin{equation\\*}\\|\\\\.\\|\\$+\\|``\\|''" nil t)
+           (let ((token (match-string 0))
+                 (start (match-beginning 0)))
+             (cond
+              ((and (not math) (equal token "\\begin{equation*}"))
+               (let ((body-start (point)))
+                 (unless (search-forward "\\end{equation*}" nil t)
+                   (user-error "Region contains an unclosed equation* environment"))
+                 (let ((body (string-trim
+                              (buffer-substring-no-properties
+                               body-start (match-beginning 0)))))
+                   (delete-region start (point))
+                   ;; Fences must be on their own lines, without indentation.
+                   (when (string-blank-p
+                          (buffer-substring (line-beginning-position) (point)))
+                     (delete-region (line-beginning-position) (point)))
+                   (unless (bolp) (insert "\n"))
+                   (insert "```math\n" body "\n```")
+                   (unless (eolp) (insert "\n")))))
+              ((member token '("$" "$$"))
+               (cond ((equal token "$") (replace-match "$$" t t))
+                     ;; Close and reopen adjacent inline math expressions.
+                     ((equal math "$") (replace-match "$$$$" t t)))
+               (cond ((equal token math) (setq math nil))
+                     ((not math) (setq math token))))
+              ((and (not math) (equal token "``"))
+               (unless quote-start (setq quote-start start)))
+              ((and (not math) quote-start (equal token "''"))
+               (replace-match "\"" t t)
+               (save-excursion
+                 (goto-char quote-start)
+                 (delete-char 2)
+                 (insert "\""))
+               (setq quote-start nil))))))
+       (buffer-string))))
+  (message "Copied region as Zulip math"))
+
+;;;###autoload
 (defun czm-tex-edit-fold-yanked-references (&rest _args)
   "Fold references just inserted by `yank' when `TeX-fold-mode' is enabled.
 Use this as after advice for `yank'.  Only \\ref and \\eqref macros

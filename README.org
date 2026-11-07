@@ -71,3 +71,15 @@ The helper folds each =\\ref= or
 =\\eqref= in the actual inserted region, including when a prefix argument
 exchanges point and mark.  For macros inserted by =TeX-insert-macro=,
 AUCTeX provides the =TeX-fold-auto= option.
+
+* Copying math to Zulip
+Select a region and run =M-x czm-tex-edit-copy-region-to-zulip=.  It copies
+the converted text to the kill ring without changing the source or point:
+=$x$= becomes =$$x$$=, =equation*= becomes a fenced =math= block, and paired
+LaTeX prose quotes become ordinary double quotes.  Quotes and primes
+within math, escaped dollars, and existing =$$= delimiters are preserved.
+
+Select complete math expressions in ordinary prose.  This command does
+not parse comments or verbatim text, expand macros, or convert other math
+environments.  An unclosed =equation*= reports an error without replacing
+the previous kill-ring entry.
