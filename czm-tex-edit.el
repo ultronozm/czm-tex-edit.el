@@ -311,7 +311,9 @@ Set mathindent to zero at the start of the document when enabling.  Remove the l
                   ;; amsart resets mathindent in its begin-document hook.
                   (insert "\\AtBeginDocument{\\setlength{\\mathindent}{0pt}}\n"))
                 (message "Left-aligned equations %s"
-                         (if enabled "disabled" "enabled"))))
+                         (if enabled "disabled" "enabled")))
+              ;; Parse the changed preamble before restoring any narrowing.
+              (syntax-propertize (point-max)))
           (set-marker preamble-end nil)))))
   (when (and (boundp 'preview-auto-mode) preview-auto-mode)
     (preview-clearout-buffer)
